@@ -9,4 +9,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Initial release: exact infrastructure cost allocation by requests, duration, or bytes using Decimal largest-remainder rounding and cost-per-request reporting.
 - Initial project structure from the factory utility template.

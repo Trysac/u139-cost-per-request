@@ -1,20 +1,9 @@
 # Testing
 
-## Running
+## Test Coverage
 
-```sh
-uv run pytest --cov=cost_per_request   # tests with coverage report
-uv run python scripts/check.py      # every gate, as CI and the factory run it
-```
+- `tests/test_cost_per_request.py`: Contains unit and acceptance tests verifying the allocation logic, validation errors, and largest-remainder rounding math.
 
-## Policy
+## Execution
 
-- Branch coverage of `src/cost_per_request` must stay at or above 80 %; the gate fails below it.
-- Tests exercise the public API (`import cost_per_request`) and assert every observable effect:
-  return values, raised exceptions and their messages.
-- Each bug fix starts with a failing test that reproduces it.
-- Tests are deterministic: no network, no wall clock, no dependence on test order.
-
-## Layout
-
-`tests/test_<module>.py` mirrors each public module. Shared fixtures go in `tests/conftest.py`.
+- Tests cover the public API (`import cost_per_request`) and assert every observable effect, including return values and raised `AllocationError` instances with correct codes.

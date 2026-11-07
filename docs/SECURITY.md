@@ -2,18 +2,8 @@
 
 ## Threat model
 
-`trysac-cost-per-request` is a pure library without I/O. The main risks are:
+`cost-per-request` is a library without I/O; threats are mitigated by design.
 
-- **Supply chain**: a compromised dependency or CI action. Mitigation: no runtime dependencies,
-  Dependabot weekly updates, actions pinned to major versions, minimal workflow permissions.
-- **Leaked secrets**: tokens committed by mistake. Mitigation: `gitleaks` runs in the local gates
-  and in CI; `.env` files are git-ignored.
-- **Untrusted input**: callers may pass hostile strings. Mitigation: validate input and fail with
-  explicit exceptions; never `eval`, `exec` or deserialize untrusted data.
-
-## Publishing
-
-Releases are published to PyPI with trusted publishing (OIDC) when available, never with a
-long-lived token stored in the repository.
-
-To report a vulnerability, see [SECURITY.md](../SECURITY.md).
+- **Input Validation**: All inputs (`CostBucket`, `UsageRecord`, `allocate`) are validated. Strings are capped at 200 characters, float values are rejected, and non-finite Decimal values trigger errors.
+- **Resource Exhaustion**: The library limits the number of distinct customers via `max_customers` to prevent DoS attacks on memory usage. Aggregation is streaming-only.
+- **Execution Risks**: No `eval`, `exec`, or unsafe deserialization. Messages in `AllocationError` are truncated to 200 characters to prevent log injection or memory issues.
