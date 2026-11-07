@@ -1,16 +1,17 @@
 # cost-per-request
 
-> Allocate infrastructure cost buckets to customers by requests, duration or bytes with Decimal largest-remainder rounding, then report cost per request Python package `trysac-cost-per-request`, import name `cost_per_request`, MIT licensed,
-> Python >= 3.10, no runtime dependencies.
+Allocate infrastructure cost buckets to customers by requests, duration or bytes with Decimal largest-remainder rounding, then report cost per request. Python package `cost-per-request`, MIT licensed, no runtime dependencies.
 
-## Docs
+## Public API
 
-- [README](README.md): problem, install, usage example
-- [AGENTS](AGENTS.md): commands, folder map, conventions, limits
-- [Architecture](docs/ARCHITECTURE.md): shape of the package and its public API
-- [Testing](docs/TESTING.md): how to run and extend the tests
+- `CostBucket(service: str, amount: Decimal, currency: str)`
+- `UsageRecord(customer: str, service: str, duration_ms: int = 0, bytes: int = 0)`
+- `allocate(costs: Sequence[CostBucket], usage: Iterable[UsageRecord], *) -> Allocation`
+- `cost_per_request(allocation: Allocation, customer: str) -> Decimal`
+- `AllocationError(code, message)`
 
-## Optional
+## Features
 
-- [Stack](docs/STACK.md): tools used and discarded
-- [Changelog](CHANGELOG.md): release history
+- **Largest Remainder Method**: Ensures parts always sum to the exact invoice amount.
+- **Bounded Aggregation**: Memory usage is proportional to the number of distinct (service, customer) pairs, not the number of records.
+- **Strict Types**: Uses Python `Decimal` for all currency calculations.

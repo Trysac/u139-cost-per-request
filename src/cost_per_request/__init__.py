@@ -1,21 +1,34 @@
-"""Allocate infrastructure cost buckets to customers by requests, duration or bytes with Decimal largest-remainder rounding, then report cost per request"""
+"""Infrastructure cost allocation by request, duration, or bytes with exact Decimal arithmetic."""
 
 from __future__ import annotations
 
-__all__ = ["__version__", "normalize"]
+import logging
+
+from cost_per_request.allocator import (
+    Allocation,
+    AllocationError,
+    AllocationErrorCode,
+    AllocationLine,
+    CostBucket,
+    UsageRecord,
+    WeightMetric,
+    allocate,
+    cost_per_request,
+)
+
+__all__ = [
+    "Allocation",
+    "AllocationError",
+    "AllocationErrorCode",
+    "AllocationLine",
+    "CostBucket",
+    "UsageRecord",
+    "WeightMetric",
+    "__version__",
+    "allocate",
+    "cost_per_request",
+]
 
 __version__ = "0.1.0"
 
-
-def normalize(value: str) -> str:
-    """Return ``value`` trimmed and lower-cased.
-
-    Placeholder API created by the template: replace it with the utility's real behavior.
-
-    Raises:
-        ValueError: if ``value`` is empty or only whitespace.
-    """
-    cleaned = value.strip()
-    if not cleaned:
-        raise ValueError("value must not be empty")
-    return cleaned.lower()
+logging.getLogger(__name__).addHandler(logging.NullHandler())

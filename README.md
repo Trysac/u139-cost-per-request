@@ -1,48 +1,41 @@
 # cost-per-request
 
-[![PyPI version](https://img.shields.io/pypi/v/trysac-cost-per-request)](https://pypi.org/project/trysac-cost-per-request/)
-[![License: MIT](https://img.shields.io/pypi/l/trysac-cost-per-request)](LICENSE)
-[![CI](https://github.com/Trysac/u139-cost-per-request/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u139-cost-per-request/actions/workflows/ci.yml)
+Platform teams know the monthly bill per service but not what each customer costs, so pricing and abuse discussions rely on guesses. Spreadsheet allocations round each share independently and the totals no longer match the invoice. This library streams usage records, allocates each cost bucket by a chosen weight with exact Decimal arithmetic so the parts always sum to the bucket, and reports cost per customer and per request.
 
-Allocate infrastructure cost buckets to customers by requests, duration or bytes with Decimal largest-remainder rounding, then report cost per request
+## Installation
 
-## Problem
-
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and what
-they do today without it. Replace this paragraph when the first real feature lands.
-
-## Install
-
-```sh
-pip install trysac-cost-per-request
-# or
-uv add trysac-cost-per-request
+```bash
+pip install cost-per-request
 ```
 
-Requires Python 3.10 or newer. No runtime dependencies.
-
-## Usage
+## Usage Example
 
 ```python
-import cost_per_request
+from decimal import Decimal
+from cost_per_request import CostBucket, UsageRecord, allocate, cost_per_request
 
-# normalize() trims surrounding whitespace and lower-cases the text.
-print(cost_per_request.normalize("  Hello World "))  # -> "hello world"
-
-# Blank input is rejected explicitly instead of returning an empty string.
-try:
-    cost_per_request.normalize("   ")
-except ValueError as exc:
-    print(f"rejected: {exc}")
+costs = [CostBucket("api", Decimal("10.00"), "USD")]
+usage = [UsageRecord("a", "api"), UsageRecord("b", "api"), UsageRecord("c", "api")]
+allocation = allocate(costs, usage, weight="requests")
+print(allocation.by_customer)  # {'a': Decimal('3.34'), 'b': Decimal('3.33'), 'c': Decimal('3.33')}
+print(cost_per_request(allocation, "a"))  # Decimal('1.113333')
 ```
 
-## Documentation
+## Public API Summary
 
-- [Architecture](docs/ARCHITECTURE.md) and [decisions](docs/decisions/)
-- [Testing](docs/TESTING.md) and [security](docs/SECURITY.md)
-- [Project record](docs/PROJECT.md) and [stack](docs/STACK.md)
-- [Changelog](CHANGELOG.md) and [contributing guide](CONTRIBUTING.md)
+- `CostBucket(service: str, amount: Decimal, currency: str)`: Represents a cost line item.
+- `UsageRecord(customer: str, service: str, duration_ms: int = 0, bytes: int = 0)`: Represents one request event.
+- `allocate(...) -> Allocation`: Allocates costs using the largest-remainder method.
+- `cost_per_request(allocation, customer: str) -> Decimal`: Calculates average cost per request.
 
-## License
+### Limits and Options
 
-[MIT](LICENSE) (c) 2026 Miguel Gomez
+- **Weights**: `requests`, `duration_ms`, `bytes`.
+- **Error Codes**: `invalid_amount`, `currency_mismatch`, `invalid_record`, `too_many_customers`, `unknown_customer`.
+- **Constraints**: Float amounts are rejected; bucket amounts must be multiples of `quantum`.
+
+## Why not spreadsheet shares?
+
+Spreadsheets often round shares independently, leading to totals that do not match the original invoice. This utility guarantees exact sums by construction using the largest-remainder method, provides a deterministic tie-breaking rule, and handles streaming input to keep memory usage bounded.
+
+For details on security, see [docs/SECURITY.md](docs/SECURITY.md).

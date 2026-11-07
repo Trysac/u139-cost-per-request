@@ -19,6 +19,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.scripts]
+cost-per-request = "cost_per_request.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/Trysac/u139-cost-per-request"
 Source = "https://github.com/Trysac/u139-cost-per-request"
