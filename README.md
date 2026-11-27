@@ -4,8 +4,10 @@ Platform teams know the monthly bill per service but not what each customer cost
 
 ## Installation
 
+Not published to PyPI yet. Install it from GitHub:
+
 ```bash
-pip install cost-per-request
+pip install "git+https://github.com/Trysac/u139-cost-per-request"
 ```
 
 ## Usage Example
